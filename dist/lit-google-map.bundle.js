@@ -2870,6 +2870,13 @@
                 return;
             }
             this.map = new google.maps.Map(this.shadowRoot.getElementById('map'), this.getMapOptions());
+            this.map.addListener("bounds_changed", () => {
+                this.dispatchEvent(new CustomEvent("bounds_changed", {
+                    detail: this.map.getBounds().toJSON(),
+                    bubbles: true,
+                    composed: true
+                }));
+            });
             this.updateMarkers();
         }
         getMapOptions() {

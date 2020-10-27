@@ -2,6 +2,8 @@
 
 This project is port of [google-map](https://www.webcomponents.org/element/GoogleWebComponents/google-map) webcomponent based on [LitElement](https://lit-element.polymer-project.org/) library.
 
+** This is a fork of https://github.com/arkadiuszwojcik/lit-google-map **
+
 ## Table of contents
 
 [How to use](#How-to-use)
@@ -90,6 +92,12 @@ Example:
 <lit-google-map api-key="SOME_API_KEY" zoom="6" map-type="satellite" center-latitude="51.8436554" center-longitude="19.5070867" set-center>    
 </lit-google-map>
 ```
+
+## Events
+
+`bounds_changed`
+
+Custom Event with `detail` attribute containing `north`, `south`, `east`, and `west` attributes.
 
 ## Marker element attributes
 

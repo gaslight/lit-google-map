@@ -1,7 +1,7 @@
-import {LitElement, html, css, customElement, property} from 'lit-element';
-import {LitGoogleMapsApi} from './lit-google-maps-api';
-import {LitGoogleMapMarker} from './lit-google-map-marker';
-import {LitSelector} from './lit-selector';
+import { LitElement, html, css, customElement, property } from 'lit-element';
+import { LitGoogleMapsApi } from './lit-google-maps-api';
+import { LitGoogleMapMarker } from './lit-google-map-marker';
+import { LitSelector } from './lit-selector';
 
 @customElement('lit-google-map')
 export class LitGoogleMap extends LitElement {
@@ -9,76 +9,76 @@ export class LitGoogleMap extends LitElement {
     /**
      * A Maps API key. To obtain an API key, see https://developers.google.com/maps/documentation/javascript/tutorial#api_key.
      */
-    @property({type : String, attribute: 'api-key'})
+    @property({ type: String, attribute: 'api-key' })
     apiKey: string = '';
 
     /**
      * Version of the Google Maps API to use.
      */
-    @property({type : String})
+    @property({ type: String })
     version: string = '3.39';
 
     /**
      * If set, custom styles can be applied to the map.
      * For style documentation see https://developers.google.com/maps/documentation/javascript/reference#MapTypeStyle
     */
-    @property({type : Object})
+    @property({ type: Object })
     styles: object = {};
 
     /**
      * A zoom level to set the map to.
      */
-    @property({type : Number})
+    @property({ type: Number })
     zoom: number = 8;
 
     /**
      * If set, the zoom level is set such that all markers (google-map-marker children) are brought into view.
      */
-    @property({type : Boolean, attribute: 'fit-to-markers'})
+    @property({ type: Boolean, attribute: 'fit-to-markers' })
     fitToMarkers: boolean = false;
 
     /**
      * Map type to display. One of 'roadmap', 'satellite', 'hybrid', 'terrain'.
      */
-    @property({type : String, attribute: 'map-type'})
+    @property({ type: String, attribute: 'map-type' })
     mapType: string = 'roadmap';
 
-    @property({type : Number, attribute: 'center-latitude'})
+    @property({ type: Number, attribute: 'center-latitude' })
     centerLatitude: number = 39.1031;
 
-    @property({type : Number, attribute: 'center-longitude'})
+    @property({ type: Number, attribute: 'center-longitude' })
     centerLongitude: number = -84.5120;
 
-    @property({type : Boolean, attribute: 'set-center'})
+    @property({ type: Boolean, attribute: 'set-center' })
     setCenter: boolean = false;
 
-    @property({type : Number, attribute: 'set-radius'})
+    @property({ type: Number, attribute: 'set-radius' })
     setRadius: number = 0;
 
-    @property({type : String, attribute: 'radius-color'})
+    @property({ type: String, attribute: 'radius-color' })
     radiusColor: string = '#f99d1c';
 
-    @property({type : String, attribute: 'radius-border-color'})
+    @property({ type: String, attribute: 'radius-border-color' })
     radiusBorderColor: string = '#f99d1c';
 
-    @property({type : Number, attribute: 'radius-opacity'})
+    @property({ type: Number, attribute: 'radius-opacity' })
     radiusOpacity: number = 0.3;
-        
-    @property({type : Number, attribute: 'radius-border-opacity'})
+
+    @property({ type: Number, attribute: 'radius-border-opacity' })
     radiusBorderOpacity: number = 0.8;
 
-    @property({type : Number, attribute: 'radius-border-weight'})
+    @property({ type: Number, attribute: 'radius-border-weight' })
     radiusBorderWeight: number = 2;
 
-    map : google.maps.Map = null;
+    map: google.maps.Map = null;
 
-    markers : Array<Node>;
+    markers: Array<Node>;
 
-    markerObserverSet : boolean = false;
+    markerObserverSet: boolean = false;
 
-    attrObserverSet : boolean = false;
+    attrObserverSet: boolean = false;
 
-    circle : google.maps.Circle = null;
+    circle: google.maps.Circle = null;
 
     initGMap() {
         if (this.map != null) {
@@ -93,13 +93,20 @@ export class LitGoogleMap extends LitElement {
 
         this.map = new google.maps.Map(this.shadowRoot.getElementById('map'), this.getMapOptions());
 
+        this.map.addListener("bounds_changed", () => {
+            this.dispatchEvent(new CustomEvent("bounds_changed", {
+                detail: this.map.getBounds().toJSON(),
+                bubbles: true,
+                composed: true
+            }))
+        });
         this.updateMarkers();
     }
 
-    getMapOptions() : google.maps.MapOptions {
+    getMapOptions(): google.maps.MapOptions {
         return {
             zoom: this.zoom,
-            center: {lat: this.centerLatitude, lng: this.centerLongitude},
+            center: { lat: this.centerLatitude, lng: this.centerLongitude },
             mapTypeId: this.mapType,
             // @ts-ignore
             styles: this.styles
@@ -116,19 +123,19 @@ export class LitGoogleMap extends LitElement {
         this.initGMap();
     }
 
-    attachChildrenToMap(children : Array<Node>) {
+    attachChildrenToMap(children: Array<Node>) {
         if (this.map) {
-          for (var i = 0, child; child = children[i]; ++i) {
-            (child as LitGoogleMapMarker).changeMap(this.map);
-          }
+            for (var i = 0, child; child = children[i]; ++i) {
+                (child as LitGoogleMapMarker).changeMap(this.map);
+            }
         }
     }
 
-    removeChildrenFromMap(children : Array<Node>) {
+    removeChildrenFromMap(children: Array<Node>) {
         if (this.map) {
             for (var i = 0, child; child = children[i]; ++i) {
                 (child as LitGoogleMapMarker).removeMap();
-              }
+            }
         }
     }
 
@@ -143,8 +150,8 @@ export class LitGoogleMap extends LitElement {
     observeAttrs() {
         if (this.attrObserverSet)
             return;
-        
-        this.addEventListener("map-attrs-changed", event => { 
+
+        this.addEventListener("map-attrs-changed", event => {
             if (this.fitToMarkers) {
                 this.fitToMarkersChanged()
             } else if (this.setCenter) {
@@ -166,15 +173,14 @@ export class LitGoogleMap extends LitElement {
         var newMarkers = markersSelector.items;
 
         // do not recompute if markers have not been added or removed
-        if (this.markers && newMarkers.length === this.markers.length)
-        {
+        if (this.markers && newMarkers.length === this.markers.length) {
             var added = newMarkers.filter(m => {
                 return this.markers && this.markers.indexOf(m) === -1;
             });
             if (added.length == 0)
                 return
         }
-        
+
         if (this.markers) {
             this.removeChildrenFromMap(this.markers)
         }
@@ -213,7 +219,7 @@ export class LitGoogleMap extends LitElement {
                     fillOpacity: this.radiusOpacity,
                     center: new google.maps.LatLng(this.centerLatitude, this.centerLongitude),
                     radius: this.setRadius
-                  });
+                });
                 this.circle = radius;
                 this.circle.setMap(this.map)
                 latLngBounds.union(radius.getBounds())
@@ -253,7 +259,7 @@ export class LitGoogleMap extends LitElement {
             fillOpacity: this.radiusOpacity,
             center: new google.maps.LatLng(this.centerLatitude, this.centerLongitude),
             radius: this.setRadius
-          });
+        });
         this.circle = radius;
         this.circle.setMap(this.map);
         bounds.union(radius.getBounds());
@@ -261,7 +267,7 @@ export class LitGoogleMap extends LitElement {
         this.map.panToBounds;
     }
 
-    deselectMarker(event : Event) {
+    deselectMarker(event: Event) {
     }
 
     static get styles() {
