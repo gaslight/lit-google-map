@@ -394,6 +394,13 @@ let LitGoogleMap = class LitGoogleMap extends LitElement {
                 composed: true
             }));
         });
+        this.map.addListener("tilesloaded", () => {
+            this.dispatchEvent(new CustomEvent("tilesloaded", {
+                detail: this.map.getBounds().toJSON(),
+                bubbles: true,
+                composed: true
+            }));
+        });
         this.updateMarkers();
     }
     getMapOptions() {

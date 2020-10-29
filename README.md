@@ -99,6 +99,8 @@ Example:
 
 Custom Event with `detail` attribute containing `north`, `south`, `east`, and `west` attributes.
 
+`tiles_loaded`
+
 ## Marker element attributes
 
 * '*latitude*' - Marker latitude position
